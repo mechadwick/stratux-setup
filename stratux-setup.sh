@@ -386,20 +386,6 @@ echo "${GREEN}...done${WHITE}"
 
 
 ##############################################################
-##  Disable serial console
-##############################################################
-echo
-echo "${YELLOW}**** Disable serial console... *****${WHITE}"
-
-##### disable serial console
-if [ -f /boot/cmdline.txt ]; then
-    sed -i /boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
-fi
-
-echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
 ##  Set the keyboard layout to US
 ##############################################################
 echo
@@ -439,17 +425,6 @@ git clone https://github.com/rm-hull/ssd1306
 cd ssd1306
 git reset --hard 232fc801b0b8bd551290e26a13122c42d628fd39
 python setup.py install
-
-echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
-##  system tweaks
-##############################################################
-echo
-echo "${YELLOW}**** system tweaks... *****${WHITE}"
-
-cp -f ${SCRIPTDIR}/modules.txt /etc/modules
 
 echo "${GREEN}...done${WHITE}"
 

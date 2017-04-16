@@ -9,8 +9,6 @@ echo "************************************"
 echo "${WHITE}"
 
 
-# TODO: rpi0 checks and setup?
-
 rpi_02_boards=("$RPI2BxREV" "$RPI2ByREV" "$RPI0xREV" "$RPI0yREV" "$RPI0wREV")
 
 ##############################################################
@@ -83,27 +81,24 @@ echo "${GREEN}...done${WHITE}"
 
 
 ##############################################################
-##  RPi 0/2 check to enable Edimax wifi dongle option
+##  Install hostapd-edimax binary
 ##############################################################
 echo
-echo "${YELLOW}**** RPi 0/2 check to enable Edimax wifi dongle option... *****${WHITE}"
+echo "${YELLOW}**** Install hostapd-edimax binary... *****${WHITE}"
 
+rm -f /usr/sbin/hostapd-edimax
+cd ${SCRIPTDIR}/files
 
-    echo "${MAGENTA}copying the hostapd-edimax binary...${WHITE}"
+# gunzip -k hostapd.gz
+gunzip -c hostapd.gz >hostapd
+if [ ! -f ./hostapd ]; then
+    echo "${BOLD}${RED}ERROR - hostapd doesn't exist, exiting...${WHITE}${NORMAL}"
+    exit
+fi
 
-    rm -f /usr/sbin/hostapd-edimax
-    cd ${SCRIPTDIR}/files
-
-    # gunzip -k hostapd.gz
-    gunzip -c hostapd.gz >hostapd
-    if [ ! -f ./hostapd ]; then
-        echo "${BOLD}${RED}ERROR - hostapd doesn't exist, exiting...${WHITE}${NORMAL}"
-        exit
-    fi
-
-    # install the binary
-    chmod 755 /usr/sbin/hostapd-edimax
-    mv ./hostapd /usr/sbin/hostapd-edimax
+# install the binary
+chmod 755 /usr/sbin/hostapd-edimax
+mv ./hostapd /usr/sbin/hostapd-edimax
 
 if [[ "rpi_02_boards" =~ "${REVISION}" ]]; then
     if ! grep -q "options 8192cu rtw_power_mgnt=0 rtw_enusbss=0" "/etc/modprobe.d/8192cu.conf"; then
@@ -129,38 +124,3 @@ if ! grep -q "i2c-dev" "/etc/modules"; then
 fi
 
 echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
-##  Sysctl tweaks
-##############################################################
-echo
-echo "${YELLOW}**** Sysctl tweaks... *****${WHITE}"
-
-if grep -q "net.core.rmem_max" "/etc/sysctl.conf"; then
-    line=$(grep -n 'net.core.rmem_max' /etc/sysctl.conf | awk -F':' '{print $1}')d
-    sed -i $line /etc/sysctl.conf
-fi
-
-if grep -q "net.core.rmem_default" "/etc/sysctl.conf"; then
-    line=$(grep -n 'net.core.rmem_default' /etc/sysctl.conf | awk -F':' '{print $1}')d
-    sed -i $line /etc/sysctl.conf
-fi
-
-if grep -q "net.core.wmem_max" "/etc/sysctl.conf"; then
-    line=$(grep -n 'net.core.wmem_max' /etc/sysctl.conf | awk -F':' '{print $1}')d
-    sed -i $line /etc/sysctl.conf
-fi
-
-if grep -q "net.core.wmem_default" "/etc/sysctl.conf"; then
-    line=$(grep -n 'net.core.wmem_default' /etc/sysctl.conf | awk -F':' '{print $1}')d
-    sed -i $line /etc/sysctl.conf
-fi
-
-echo "net.core.rmem_max = 167772160" >>/etc/sysctl.conf
-echo "net.core.rmem_default = 167772160" >>/etc/sysctl.conf
-echo "net.core.wmem_max = 167772160" >>/etc/sysctl.conf
-echo "net.core.wmem_default = 167772160" >>/etc/sysctl.conf
-
-echo "${GREEN}...done${WHITE}"
-
