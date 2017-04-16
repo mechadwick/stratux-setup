@@ -30,16 +30,6 @@ SCRIPTDIR="`pwd`"
 
 #set -e
 
-#outfile=setuplog
-#rm -f $outfile
-
-#exec > >(cat >> $outfile)
-#exec 2> >(cat >> $outfile)
-
-#### stdout and stderr to log file
-#exec > >(tee -a $outfile >&1)
-#exec 2> >(tee -a $outfile >&2)
-
 #### execute the script: bash stratux-setup.sh
 
 #### Revision numbers found via cat /proc/cpuinfo
@@ -322,7 +312,7 @@ export GOPATH=/root/go_path
 export GOROOT=/root/go
 export PATH=${PATH}:/root/go/bin:/root/go_path/bin
 
-# source /root/.bashrc
+source /root/.bashrc
 
 echo "${GREEN}...done${WHITE}"
 
