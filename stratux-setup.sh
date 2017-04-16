@@ -95,7 +95,7 @@ echo "**** Stratux Setup Starting... *****"
 echo "************************************"
 echo "${WHITE}"
 
-if which ntp >/dev/null; then
+if hash ntp 2>/dev/null; then
     ntp -q -g
 fi
 
@@ -324,7 +324,7 @@ export GOPATH=/root/go_path
 export GOROOT=/root/go
 export PATH=${PATH}:/root/go/bin:/root/go_path/bin
 
-source /root/.bashrc
+# source /root/.bashrc
 
 echo "${GREEN}...done${WHITE}"
 
@@ -422,6 +422,20 @@ echo
 echo "${YELLOW}**** Stratux build and installation... *****${WHITE}"
 
 cd /root
+
+if hash ntp 2>/dev/null; then
+    update-rc.d ntp disable
+    systemctl disbable ntp
+fi
+
+if hash go 2>/dev/null; then
+    echo "...found the go compiler..."
+else
+    echo "...no go compiler found exporting go environment variables..."
+    export GOPATH=/root/go_path
+    export GOROOT=/root/go
+    export PATH=${PATH}:/root/go/bin:/root/go_path/bin
+fi
 
 #### install go-sqlite3 (speeds up Stratux builds).
 go get github.com/mattn/go-sqlite3
@@ -610,7 +624,7 @@ echo "${GREEN}...done${WHITE}"
 echo
 echo "${YELLOW}**** Disable ntpd, dhcpcd, and hciuart... *****${WHITE}"
 
-if which ntp >/dev/null; then
+if hash ntp 2>/dev/null; then
     update-rc.d ntp disable
     systemctl disbable ntp
 fi
@@ -619,7 +633,7 @@ fi
 systemctl disable dhcpcd
 
 #disable hciuart - interferes with ttyAMA0 as a serial port
-if which hciuart >/dev/null; then
+if hash hciuart 2>/dev/null; then
     systemctl disable hciuart
 fi
 
