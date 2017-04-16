@@ -429,15 +429,16 @@ if hash ntp 2>/dev/null; then
 fi
 
 if hash go 2>/dev/null; then
-    echo "...found the go compiler..."
+    echo "${YELLOW}...found the go compiler...${WHITE}"
 else
-    echo "...no go compiler found exporting go environment variables..."
+    echo "${YELLOW}...no go compiler found exporting go environment variables...${WHITE}"
     export GOPATH=/root/go_path
     export GOROOT=/root/go
     export PATH=${PATH}:/root/go/bin:/root/go_path/bin
 fi
 
 #### install go-sqlite3 (speeds up Stratux builds).
+echo "${YELLOW}Note, fetching and installing go-sqlite3 may take some time so be patient...${WHITE}"
 go get github.com/mattn/go-sqlite3
 go install github.com/mattn/go-sqlite3
 
