@@ -430,10 +430,11 @@ go install github.com/mattn/go-sqlite3
 rm -rf stratux
 git clone https://github.com/cyoung/stratux --recursive
 cd stratux
-git fetch --tags
-tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+#git fetch --tags
+#tag=$(git describe --tags `git rev-list --tags --max-count=1`)
 # checkout the latest release
-git checkout $tag
+#git checkout $tag
+git checkout tags/v1.2r2
 
 make all
 make install
