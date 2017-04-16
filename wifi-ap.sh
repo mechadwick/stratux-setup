@@ -52,20 +52,14 @@ echo "${GREEN}...done${WHITE}"
 echo
 echo "${YELLOW}**** Setup /etc/hostapd/hostapd.conf *****${WHITE}"
 
-rpi_boards=("$RPI2BxREV" "$RPI2ByREV" "$RPI0xREV" "$RPI0yREV" "$RPI0wREV")
-if [[ "${rpi_boards[@]}" =~ "${REVISION}" ]]; then
-
 cat <<EOT > /etc/hostapd/hostapd-edimax.conf
 interface=$wifi_interface
 driver=rtl871xdrv
 hw_mode=g
-channel=1
 wmm_enabled=1
 ieee80211n=1
 ignore_broadcast_ssid=0
 EOT
-
-fi
 
 cat <<EOT > /etc/hostapd/hostapd.conf
 interface=$wifi_interface
@@ -87,10 +81,10 @@ echo "${YELLOW}**** Setup /etc/network/interfaces *****${WHITE}"
 cp -n /etc/network/interfaces{,.bak}
 
 cat <<EOT > /etc/network/interfaces
-source-directory /etc/network/interfaces.d
-
 auto lo
+
 iface lo inet loopback
+iface eth0 inet dhcp
 
 allow-hotplug wlan0
 
@@ -114,20 +108,3 @@ chmod 755 ${SCRIPTDIR}/files/stratux-wifi.sh
 cp ${SCRIPTDIR}/stratux-wifi.sh /usr/sbin/stratux-wifi.sh
 
 echo "${GREEN}...done${WHITE}"
-
-
-#################################################
-## Legacy wifiap cleanup
-#################################################
-echo
-echo "${YELLOW}**** Legacy wifiap cleanup *****${WHITE}"
-
-#### legacy file check
-if [ -f "/etc/init.d/wifiap" ]; then
-    service wifiap stop
-    rm -f /etc/init.d/wifiap
-    echo "${MAGENTA}legacy wifiap service stopped and file removed... *****${WHITE}"
-fi
-
-echo "${GREEN}...done${WHITE}"
-
