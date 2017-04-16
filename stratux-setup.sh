@@ -242,17 +242,6 @@ echo "${GREEN}...done${WHITE}"
 
 
 ##############################################################
-##  uavionix udev rules
-##############################################################
-echo
-echo "${YELLOW}**** uavionix udev rules to /etc/udev/rules.d/99-uavionix.rules *****${WHITE}"
-
-cp -f  ${SCRIPTDIR}/files/99-uavionix.rules /etc/udev/rules.d
-
-echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
 ## Copying fancontrol.py file
 ##############################################################
 echo
@@ -273,17 +262,6 @@ echo "${YELLOW}**** SSHD config... *****${WHITE}"
 cp -n /etc/ssh/sshd_config{,.bak}
 cp -f ${SCRIPTDIR}/files/sshd_config /etc/ssh/sshd_config
 rm -f /usr/share/dbus-1/system-services/fi.epitest.hostap.WPASupplicant.service
-
-echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
-##  Stratux udev rules
-##############################################################
-echo
-echo "${YELLOW}**** Stratux udev rules to /etc/udev/rules.d/10-stratux.rules *****${WHITE}"
-
-cp -f  ${SCRIPTDIR}/files/10-stratux.rules /etc/udev/rules.d
 
 echo "${GREEN}...done${WHITE}"
 
@@ -595,16 +573,6 @@ echo "${YELLOW}**** Copying rc.local file... *****${WHITE}"
 chmod 755 ${SCRIPTDIR}/files/rc.local
 cp -f ${SCRIPTDIR}/files/rc.local /etc/rc.local
 
-
-echo "${YELLOW}**** Copying __lib__systemd__system__stratux.service file... *****${WHITE}"
-
-chmod 755 ${SCRIPTDIR}/files/__lib__systemd__system__stratux.service
-cp -f ${SCRIPTDIR}/files/__lib__systemd__system__stratux.service /lib/systemd/system/stratux.service
-
-echo "${YELLOW}**** Copying __root__stratux-pre-start.sh file... *****${WHITE}"
-
-chmod 755 ${SCRIPTDIR}/files/__root__stratux-pre-start.sh
-cp -f ${SCRIPTDIR}/files/__root__stratux-pre-start.sh /root/stratux-pre-start.sh
 
 echo "${GREEN}...done${WHITE}"
 
