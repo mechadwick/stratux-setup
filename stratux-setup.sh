@@ -211,9 +211,9 @@ if [ ! -d /etc/ssh/authorized_keys ]; then
 fi
 
 cp -n /etc/ssh/authorized_keys/root{,.bak}
+chown root.root ${SCRIPTDIR}/files/root
+chmod 644 ${SCRIPTDIR}/files/root
 cp -f ${SCRIPTDIR}/files/root /etc/ssh/authorized_keys/root
-chown root.root /etc/ssh/authorized_keys/root
-chmod 644 /etc/ssh/authorized_keys/root
 
 echo "${GREEN}...done${WHITE}"
 
@@ -637,6 +637,17 @@ systemctl disable dhcpcd
 if hash hciuart 2>/dev/null; then
     systemctl disable hciuart
 fi
+
+echo "${GREEN}...done${WHITE}"
+
+
+##############################################################
+## Enable isc-dhcp-server
+##############################################################
+echo
+echo "${YELLOW}**** Enable isc-dhcp-server... *****${WHITE}"
+
+systemctl enable isc-dhcp-server
 
 echo "${GREEN}...done${WHITE}"
 
