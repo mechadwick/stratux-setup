@@ -41,7 +41,7 @@ EOT
 
 ### set /etc/dhcp/dhcpd.conf
 cp -n /etc/dhcp/dhcpd.conf{,.bak}
-cp -f ${SCRIPTDIR}/files/dhcpd.conf etc/dhcp/dhcpd.conf
+cp -f ${SCRIPTDIR}/files/dhcpd.conf /etc/dhcp/dhcpd.conf
 
 echo "${GREEN}...done${WHITE}"
 

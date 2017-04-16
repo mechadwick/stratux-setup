@@ -170,31 +170,25 @@ echo "${GREEN}...done${WHITE}"
 
 
 ##############################################################
-##  Hardware check
+## Enable isc-dhcp-server
 ##############################################################
 echo
-echo "${YELLOW}**** Hardware check... *****${WHITE}"
+echo "${YELLOW}**** Enable isc-dhcp-server... *****${WHITE}"
 
-if [[ "${rpi_boards[@]}" =~ "${REVISION}" ]]; then
-    echo
-    echo "${MAGENTA}Raspberry Pi detected...${WHITE}"
+systemctl enable isc-dhcp-server
 
-    . ${SCRIPTDIR}/rpi.sh
-elif [ "$REVISION" == "$ODROIDC2" ]; then
-    echo
-    echo "${MAGENTA}Odroid-C2 detected...${WHITE}"
+echo "${GREEN}...done${WHITE}"
 
-    . ${SCRIPTDIR}/odroid.sh
-elif [ "$REVISION" == "$CHIP" ]; then
-    echo
-    echo "${MAGENTA}CHIP detected...${WHITE}"
 
-    . ${SCRIPTDIR}/chip.sh
-else
-    echo
-    echo "${BOLD}${RED}WARNING - unable to identify the board using /proc/cpuinfo...${WHITE}${NORMAL}"
+##############################################################
+## Disable ntpd
+##############################################################
+echo
+echo "${YELLOW}**** Disable ntpd... *****${WHITE}"
 
-    #exit
+if hash ntp 2>/dev/null; then
+    update-rc.d ntp disable
+    systemctl disbable ntp
 fi
 
 echo "${GREEN}...done${WHITE}"
@@ -225,6 +219,29 @@ echo
 echo "${YELLOW}**** Copying motd file... *****${WHITE}"
 
 cp -f ${SCRIPTDIR}/files/motd /etc/motd
+
+echo "${GREEN}...done${WHITE}"
+
+
+##############################################################
+##  WiFi Access Point setup
+##############################################################
+echo
+echo "${YELLOW}**** WiFi Access Point setup... *****${WHITE}"
+
+. ${SCRIPTDIR}/wifi-ap.sh
+
+echo "${GREEN}...done${WHITE}"
+
+
+##############################################################
+## Copying the hostapd_manager.sh utility
+##############################################################
+echo
+echo "${YELLOW}**** Copying the hostapd_manager.sh utility... *****${WHITE}"
+
+chmod 755 ${SCRIPTDIR}/files/hostapd_manager.sh
+cp -f ${SCRIPTDIR}/files/hostapd_manager.sh /usr/bin/hostapd_manager.sh
 
 echo "${GREEN}...done${WHITE}"
 
@@ -261,18 +278,6 @@ echo "${YELLOW}**** SSHD config... *****${WHITE}"
 
 cp -n /etc/ssh/sshd_config{,.bak}
 cp -f ${SCRIPTDIR}/files/sshd_config /etc/ssh/sshd_config
-rm -f /usr/share/dbus-1/system-services/fi.epitest.hostap.WPASupplicant.service
-
-echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
-##  Hardware blacklisting
-##############################################################
-echo
-echo "${YELLOW}**** Hardware blacklisting... *****${WHITE}"
-
-cp -f ${SCRIPTDIR}/files/rtl-sdr-blacklist.conf /etc/modprobe.d/
 
 echo "${GREEN}...done${WHITE}"
 
@@ -329,6 +334,106 @@ export PATH=${PATH}:/root/go/bin:/root/go_path/bin
 echo "${GREEN}...done${WHITE}"
 
 
+#################################################
+## Add .stxAliases command to /root/.bashrc
+#################################################
+echo
+echo "${YELLOW}**** Add .stxAliases command to /root/.bashrc *****${WHITE}"
+
+# This will allow users to keep an alias file after this file is added
+if ! grep -q ".aliases" "/root/.bashrc"; then
+cat <<EOT >> /root/.bashrc
+if [ -f /root/.aliases ]; then
+. /root/.aliases
+fi
+EOT
+fi
+
+# Useful aliases for stratux debugging
+if ! grep -q ".stxAliases" "/root/.bashrc"; then
+cat <<EOT >> /root/.bashrc
+if [ -f /root/.stxAliases ]; then
+. /root/.stxAliases
+fi
+EOT
+fi
+
+echo "${GREEN}...done${WHITE}"
+
+
+#################################################
+## Setup /root/.stxAliases
+#################################################
+echo
+echo "${YELLOW}**** Setup /root/.stxAliases *****${WHITE}"
+
+if [ -f "/root/stratux/image/stxAliases.txt" ]; then
+    cp /root/stratux/image/stxAliases.txt /root/.stxAliases
+else
+    cp -f ${SCRIPTDIR}/files/stxAliases.txt /root/.stxAliases
+fi
+
+if [ ! -f "/root/.stxAliases" ]; then
+    echo "${BOLD}${RED}ERROR - /root/.stxAliases file missing, exiting...${WHITE}${NORMAL}"
+    exit
+fi
+
+echo "${GREEN}...done${WHITE}"
+
+
+##############################################################
+##  Hardware blacklisting
+##############################################################
+echo
+echo "${YELLOW}**** Hardware blacklisting... *****${WHITE}"
+
+cp -f ${SCRIPTDIR}/files/rtl-sdr-blacklist.conf /etc/modprobe.d/
+
+echo "${GREEN}...done${WHITE}"
+
+
+##############################################################
+##  Disable serial console
+##############################################################
+echo
+echo "${YELLOW}**** Disable serial console... *****${WHITE}"
+
+##### disable serial console
+if [ -f /boot/cmdline.txt ]; then
+    sed -i /boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
+fi
+
+echo "${GREEN}...done${WHITE}"
+
+
+##############################################################
+##  Set the keyboard layout to US
+##############################################################
+echo
+echo "${YELLOW}**** Set the keyboard layout to US... *****${WHITE}"
+
+##### Set the keyboard layout to US.
+if [ -f /etc/default/keyboard ]; then
+    sed -i /etc/default/keyboard -e "/^XKBLAYOUT/s/\".*\"/\"us\"/"
+fi
+
+echo "${GREEN}...done${WHITE}"
+
+
+##############################################################
+## OLED screen setup
+##############################################################
+echo
+echo "${YELLOW}**** OLED screen setup... *****${WHITE}"
+
+cp ${SCRIPTDIR}/files/screen/screen.py /usr/bin/stratux-screen.py
+mkdir -p /etc/stratux-screen/
+cp -f ${SCRIPTDIR}/files/screen/stratux-logo-64x64.bmp /etc/stratux-screen/stratux-logo-64x64.bmp
+cp -f ${SCRIPTDIR}/files/screen/CnC_Red_Alert.ttf /etc/stratux-screen/CnC_Red_Alert.ttf
+
+echo "${GREEN}...done${WHITE}"
+
+
 ##############################################################
 ##  External OLED screen
 ##############################################################
@@ -341,6 +446,47 @@ git clone https://github.com/rm-hull/ssd1306
 cd ssd1306
 git reset --hard 232fc801b0b8bd551290e26a13122c42d628fd39
 python setup.py install
+
+echo "${GREEN}...done${WHITE}"
+
+
+##############################################################
+##  system tweaks
+##############################################################
+echo
+echo "${YELLOW}**** system tweaks... *****${WHITE}"
+
+cp -f ${SCRIPTDIR}/modules.txt /etc/modules
+
+echo "${GREEN}...done${WHITE}"
+
+
+##############################################################
+## Copying start-up scripts
+##############################################################
+echo
+echo "${YELLOW}**** Copying rc.local file... *****${WHITE}"
+
+chmod 755 ${SCRIPTDIR}/files/rc.local
+cp -f ${SCRIPTDIR}/files/rc.local /etc/rc.local
+
+
+echo "${GREEN}...done${WHITE}"
+
+
+##############################################################
+## Disable dhcpcd and hciuart
+##############################################################
+echo
+echo "${YELLOW}**** Disable dhcpcd and hciuart... *****${WHITE}"
+
+#dhcpcd causes first boot hanging
+systemctl disable dhcpcd
+
+#disable hciuart - interferes with ttyAMA0 as a serial port
+if hash hciuart 2>/dev/null; then
+    systemctl disable hciuart
+fi
 
 echo "${GREEN}...done${WHITE}"
 
@@ -424,7 +570,7 @@ echo "${YELLOW}**** Stratux build and installation... *****${WHITE}"
 cd /root
 
 if hash ntp 2>/dev/null; then
-    update-rc.d ntp disable
+    #update-rc.d ntp disable
     systemctl disbable ntp
 fi
 
@@ -483,171 +629,6 @@ cd kalibrate-rtl
 ./configure
 make
 make install
-
-echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
-##  System tweaks
-##############################################################
-echo
-echo "${YELLOW}**** System tweaks... *****${WHITE}"
-
-##### disable serial console
-if [ -f /boot/cmdline.txt ]; then
-    sed -i /boot/cmdline.txt -e "s/console=ttyAMA0,[0-9]\+ //"
-fi
-
-##### Set the keyboard layout to US.
-if [ -f /etc/default/keyboard ]; then
-    sed -i /etc/default/keyboard -e "/^XKBLAYOUT/s/\".*\"/\"us\"/"
-fi
-
-#### allow starting services
-if [ -f /usr/sbin/policy-rc.d ]; then
-    rm /usr/sbin/policy-rc.d
-fi
-
-echo "${GREEN}...done${WHITE}"
-
-
-#################################################
-## Setup /root/.stxAliases
-#################################################
-echo
-echo "${YELLOW}**** Setup /root/.stxAliases *****${WHITE}"
-
-if [ -f "/root/stratux/image/stxAliases.txt" ]; then
-    cp /root/stratux/image/stxAliases.txt /root/.stxAliases
-else
-    cp -f ${SCRIPTDIR}/files/stxAliases.txt /root/.stxAliases
-fi
-
-if [ ! -f "/root/.stxAliases" ]; then
-    echo "${BOLD}${RED}ERROR - /root/.stxAliases file missing, exiting...${WHITE}${NORMAL}"
-    exit
-fi
-
-echo "${GREEN}...done${WHITE}"
-
-
-#################################################
-## Add .stxAliases command to /root/.bashrc
-#################################################
-echo
-echo "${YELLOW}**** Add .stxAliases command to /root/.bashrc *****${WHITE}"
-
-# This will allow users to keep an alias file after this file is added
-if ! grep -q ".aliases" "/root/.bashrc"; then
-cat <<EOT >> /root/.bashrc
-if [ -f /root/.aliases ]; then
-. /root/.aliases
-fi
-EOT
-fi
-
-# Useful aliases for stratux debugging
-if ! grep -q ".stxAliases" "/root/.bashrc"; then
-cat <<EOT >> /root/.bashrc
-if [ -f /root/.stxAliases ]; then
-. /root/.stxAliases
-fi
-EOT
-fi
-
-echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
-##  system tweaks
-##############################################################
-echo
-echo "${YELLOW}**** system tweaks... *****${WHITE}"
-
-cp -f ${SCRIPTDIR}/modules.txt /etc/modules
-
-echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
-##  WiFi Access Point setup
-##############################################################
-echo
-echo "${YELLOW}**** WiFi Access Point setup... *****${WHITE}"
-
-. ${SCRIPTDIR}/wifi-ap.sh
-
-echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
-## Copying start-up scripts
-##############################################################
-echo
-echo "${YELLOW}**** Copying rc.local file... *****${WHITE}"
-
-chmod 755 ${SCRIPTDIR}/files/rc.local
-cp -f ${SCRIPTDIR}/files/rc.local /etc/rc.local
-
-
-echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
-## Copying the hostapd_manager.sh utility
-##############################################################
-echo
-echo "${YELLOW}**** Copying the hostapd_manager.sh utility... *****${WHITE}"
-
-chmod 755 ${SCRIPTDIR}/files/hostapd_manager.sh
-cp -f ${SCRIPTDIR}/files/hostapd_manager.sh /usr/bin/hostapd_manager.sh
-
-echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
-## OLED screen setup
-##############################################################
-echo
-echo "${YELLOW}**** OLED screen setup... *****${WHITE}"
-
-cp ${SCRIPTDIR}/files/screen/screen.py /usr/bin/stratux-screen.py
-mkdir -p /etc/stratux-screen/
-cp -f ${SCRIPTDIR}/files/screen/stratux-logo-64x64.bmp /etc/stratux-screen/stratux-logo-64x64.bmp
-cp -f ${SCRIPTDIR}/files/screen/CnC_Red_Alert.ttf /etc/stratux-screen/CnC_Red_Alert.ttf
-
-echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
-## Disable ntpd, dhcpcd, and hciuart
-##############################################################
-echo
-echo "${YELLOW}**** Disable ntpd, dhcpcd, and hciuart... *****${WHITE}"
-
-if hash ntp 2>/dev/null; then
-    update-rc.d ntp disable
-    systemctl disbable ntp
-fi
-
-#dhcpcd causes first boot hanging
-systemctl disable dhcpcd
-
-#disable hciuart - interferes with ttyAMA0 as a serial port
-if hash hciuart 2>/dev/null; then
-    systemctl disable hciuart
-fi
-
-echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
-## Enable isc-dhcp-server
-##############################################################
-echo
-echo "${YELLOW}**** Enable isc-dhcp-server... *****${WHITE}"
-
-systemctl enable isc-dhcp-server
 
 echo "${GREEN}...done${WHITE}"
 
