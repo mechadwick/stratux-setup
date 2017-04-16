@@ -134,10 +134,10 @@ echo "${GREEN}...done${WHITE}"
 echo
 echo "${YELLOW}**** Installing dependencies... *****${WHITE}"
 
-#if [[ "${rpi_boards[@]}" =~ "${REVISION}" ]]; then
-#    apt-get install -y rpi-update
-#    rpi-update
-#fi
+if [[ "${rpi_boards[@]}" =~ "${REVISION}" ]]; then
+    apt-get install -y rpi-update
+    rpi-update
+fi
 
 apt-get update -y
 apt-mark hold plymouth
