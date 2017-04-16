@@ -41,22 +41,7 @@ EOT
 
 ### set /etc/dhcp/dhcpd.conf
 cp -n /etc/dhcp/dhcpd.conf{,.bak}
-cat <<EOT > /etc/dhcp/dhcpd.conf
-ddns-update-style none;
-default-lease-time 86400; # 24 hours
-max-lease-time 172800; # 48 hours
-authoritative;
-log-facility local7;
-subnet 192.168.10.0 netmask 255.255.255.0 {
-    range 192.168.10.10 192.168.10.50;
-    option broadcast-address 192.168.10.255;
-    option routers 192.168.10.1;
-    default-lease-time 12000;
-    max-lease-time 12000;
-    option domain-name "stratux.local";
-    option domain-name-servers 4.2.2.2;
-}
-EOT
+cp -f ${SCRIPTDIR}/files/dhcpd.conf etc/dhcp/dhcpd.conf
 
 echo "${GREEN}...done${WHITE}"
 
@@ -67,7 +52,8 @@ echo "${GREEN}...done${WHITE}"
 echo
 echo "${YELLOW}**** Setup /etc/hostapd/hostapd.conf *****${WHITE}"
 
-if [ "$REVISION" == "$RPI2BxREV" ] || [ "$REVISION" == "$RPI2ByREV" ] || [ "$REVISION" = "$RPI0xREV" ] || [ "$REVISION" = "$RPI0yREV" ]; then
+rpi_boards=("$RPI2BxREV" "$RPI2ByREV" "$RPI0xREV" "$RPI0yREV" "$RPI0wREV")
+if [[ "${rpi_boards[@]}" =~ "${REVISION}" ]]; then
 
 cat <<EOT > /etc/hostapd/hostapd-edimax.conf
 interface=$wifi_interface

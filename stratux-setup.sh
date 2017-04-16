@@ -53,6 +53,7 @@ SCRIPTDIR="`pwd`"
 #
 RPI0xREV=900092
 RPI0yREV=900093
+RPI0wREV=9000c1
 
 RPI2BxREV=a01041
 RPI2ByREV=a21041
@@ -70,6 +71,8 @@ RPIAPxREV=0012
 RPIBPyREV=0013
 
 REVISION="$(cat /proc/cpuinfo | grep Revision | cut -d ':' -f 2 | xargs)"
+
+rpi_boards=("$RPI2BxREV" "$RPI2ByREV" "$RPI3BxREV" "$RPI3ByREV" "$RPI0xREV" "$RPI0yREV" "$RPI0wREV")
 
 
 # Processor 
@@ -131,7 +134,7 @@ echo "${GREEN}...done${WHITE}"
 echo
 echo "${YELLOW}**** Installing dependencies... *****${WHITE}"
 
-if [ "$REVISION" == "$RPI2BxREV" ] || [ "$REVISION" == "$RPI2ByREV" ]  || [ "$REVISION" == "$RPI3BxREV" ] || [ "$REVISION" == "$RPI3ByREV" ] || [ "$REVISION" == "$RPI0xREV" ] || [ "$REVISION" == "$RPI0yREV" ]; then
+if [[ "${rpi_boards[@]}" =~ "${REVISION}" ]]; then
     apt-get install -y rpi-update
     rpi-update
 fi
@@ -172,7 +175,7 @@ echo "${GREEN}...done${WHITE}"
 echo
 echo "${YELLOW}**** Hardware check... *****${WHITE}"
 
-if [ "$REVISION" == "$RPI2BxREV" ] || [ "$REVISION" == "$RPI2ByREV" ]  || [ "$REVISION" == "$RPI3BxREV" ] || [ "$REVISION" == "$RPI3ByREV" ] || [ "$REVISION" == "$RPI0xREV" ] || [ "$REVISION" == "$RPI0yREV" ]; then
+if [[ "${rpi_boards[@]}" =~ "${REVISION}" ]]; then
     echo
     echo "${MAGENTA}Raspberry Pi detected...${WHITE}"
 
@@ -344,6 +347,22 @@ export GOROOT=/root/go
 export PATH=${PATH}:/root/go/bin:/root/go_path/bin
 
 source /root/.bashrc
+
+echo "${GREEN}...done${WHITE}"
+
+
+##############################################################
+##  External OLED screen
+##############################################################
+echo
+echo "${YELLOW}**** External OLED screen... *****${WHITE}"
+
+cd /root
+
+git clone https://github.com/rm-hull/ssd1306
+cd ssd1306
+git reset --hard 232fc801b0b8bd551290e26a13122c42d628fd39
+python setup.py install
 
 echo "${GREEN}...done${WHITE}"
 
@@ -528,7 +547,7 @@ echo "${YELLOW}**** Add .stxAliases command to /root/.bashrc *****${WHITE}"
 if ! grep -q ".aliases" "/root/.bashrc"; then
 cat <<EOT >> /root/.bashrc
 if [ -f /root/.aliases ]; then
-. /root/.stxAliases
+. /root/.aliases
 fi
 EOT
 fi
@@ -541,6 +560,18 @@ if [ -f /root/.stxAliases ]; then
 fi
 EOT
 fi
+
+echo "${GREEN}...done${WHITE}"
+
+
+
+##############################################################
+##  system tweaks
+##############################################################
+echo
+echo "${YELLOW}**** system tweaks... *****${WHITE}"
+
+cp -f ${SCRIPTDIR}/modules.txt /etc/modules
 
 echo "${GREEN}...done${WHITE}"
 
@@ -563,7 +594,7 @@ echo
 echo "${YELLOW}**** Copying rc.local file... *****${WHITE}"
 
 chmod 755 ${SCRIPTDIR}/files/rc.local
-cp -f ${SCRIPTDIR}/files/rc.local /usr/bin/rc.local
+cp -f ${SCRIPTDIR}/files/rc.local /etc/rc.local
 
 
 echo "${YELLOW}**** Copying __lib__systemd__system__stratux.service file... *****${WHITE}"
@@ -573,7 +604,7 @@ cp -f ${SCRIPTDIR}/files/__lib__systemd__system__stratux.service /lib/systemd/sy
 
 echo "${YELLOW}**** Copying __root__stratux-pre-start.sh file... *****${WHITE}"
 
-chmod 755 ${SCRIPTDIR}/files/__lib__systemd__system__stratux.service
+chmod 755 ${SCRIPTDIR}/files/__root__stratux-pre-start.sh
 cp -f ${SCRIPTDIR}/files/__root__stratux-pre-start.sh /root/stratux-pre-start.sh
 
 echo "${GREEN}...done${WHITE}"
@@ -611,14 +642,22 @@ echo "${GREEN}...done${WHITE}"
 
 
 ##############################################################
-## Disable ntpd autostart
+## Disable ntpd, dhcpcd, and hciuart
 ##############################################################
 echo
-echo "${YELLOW}**** Disable ntpd autostart... *****${WHITE}"
+echo "${YELLOW}**** Disable ntpd, dhcpcd, and hciuart... *****${WHITE}"
 
 if which ntp >/dev/null; then
     update-rc.d ntp disable
     systemctl disbable ntp
+fi
+
+#dhcpcd causes first boot hanging
+systemctl disable dhcpcd
+
+#disable hciuart - interferes with ttyAMA0 as a serial port
+if which hciuart >/dev/null; then
+    systemctl disable hciuart
 fi
 
 echo "${GREEN}...done${WHITE}"
