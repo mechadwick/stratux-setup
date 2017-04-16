@@ -595,11 +595,6 @@ echo "${GREEN}...done${WHITE}"
 echo
 echo "${YELLOW}**** OLED screen setup... *****${WHITE}"
 
-cd /root
-git clone https://github.com/rm-hull/ssd1306
-cd ssd1306 && python setup.py install
-cd ssd1306 && python setup.py install
-
 cp ${SCRIPTDIR}/files/screen/screen.py /usr/bin/stratux-screen.py
 mkdir -p /etc/stratux-screen/
 cp -f ${SCRIPTDIR}/files/screen/stratux-logo-64x64.bmp /etc/stratux-screen/stratux-logo-64x64.bmp
