@@ -105,6 +105,6 @@ echo "${YELLOW}**** Setup /usr/sbin/stratux-wifi.sh *****${WHITE}"
 
 # we use a slightly modified version to handle more hardware scenarios
 chmod 755 ${SCRIPTDIR}/files/stratux-wifi.sh
-cp ${SCRIPTDIR}/stratux-wifi.sh /usr/sbin/stratux-wifi.sh
+cp ${SCRIPTDIR}/files/stratux-wifi.sh /usr/sbin/stratux-wifi.sh
 
 echo "${GREEN}...done${WHITE}"
