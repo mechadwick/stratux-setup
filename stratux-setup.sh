@@ -139,7 +139,7 @@ echo "${YELLOW}**** Installing dependencies... *****${WHITE}"
 #    rpi-update
 #fi
 
-#apt-get update -y
+apt-get update -y
 apt-mark hold plymouth
 apt-get dist-upgrade -y
 apt-get upgrade -y
