@@ -43,13 +43,6 @@ SCRIPTDIR="`pwd`"
 #### execute the script: bash stratux-setup.sh
 
 #### Revision numbers found via cat /proc/cpuinfo
-# [Labeled Section]                                       [File]
-# Dependencies                                          - stratux-setup.sh
-# Hardware check                                        - stratux-setup.sh
-# Setup /etc/hostapd/hostapd.conf                       - wifi-ap.sh
-# Edimax WiFi check                                     - stratux-wifi.sh
-# Boot config settings                                  - rpi.sh
-# RPi 0/2 check to enable Edimax wifi dongle option     - rpi.sh
 #
 RPI0xREV=900092
 RPI0yREV=900093
