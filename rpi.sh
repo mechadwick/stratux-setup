@@ -41,13 +41,6 @@ if ! grep -q "dtparam=i2c_arm_baudrate=400000" "/boot/config.txt"; then
     echo "dtparam=i2c_arm_baudrate=400000" >>/boot/config.txt
 fi
 
-if [ "$REVISION" == "$RPI3BxREV" ] || [ "$REVISION" == "$RPI3ByREV" ]; then
-    # move RPi3 Bluetooth off of hardware UART to free up connection for GPS
-    if ! grep -q "dtoverlay=pi3-miniuart-bt" "/boot/config.txt"; then
-        echo "dtoverlay=pi3-miniuart-bt" >>/boot/config.txt
-    fi
-fi
-
 if ! grep -q "dtparam=act_led_trigger=none" "/boot/config.txt"; then
     echo "dtparam=act_led_trigger=none" >>/boot/config.txt
 fi
@@ -56,18 +49,24 @@ if ! grep -q "dtparam=act_led_activelow=off" "/boot/config.txt"; then
     echo "dtparam=act_led_activelow=off" >>/boot/config.txt
 fi
 
-if ! grep -q "arm_freq=900" "/boot/config.txt"; then
-    echo "arm_freq=900" >>/boot/config.txt
-fi
+if [ "$REVISION" == "$RPI3BxREV" ] || [ "$REVISION" == "$RPI3ByREV" ]; then
+    # move RPi3 Bluetooth off of hardware UART to free up connection for GPS
+    if ! grep -q "dtoverlay=pi3-miniuart-bt" "/boot/config.txt"; then
+        echo "dtoverlay=pi3-miniuart-bt" >>/boot/config.txt
+    fi
+    
+    if ! grep -q "arm_freq=900" "/boot/config.txt"; then
+        echo "arm_freq=900" >>/boot/config.txt
+    fi
 
-if ! grep -q "sdram_freq=450" "/boot/config.txt"; then
-    echo "sdram_freq=450" >>/boot/config.txt
-fi
+    if ! grep -q "sdram_freq=450" "/boot/config.txt"; then
+        echo "sdram_freq=450" >>/boot/config.txt
+    fi
 
-if ! grep -q "core_freq=450" "/boot/config.txt"; then
-    echo "core_freq=450" >>/boot/config.txt
+    if ! grep -q "core_freq=450" "/boot/config.txt"; then
+        echo "core_freq=450" >>/boot/config.txt
+    fi
 fi
-
 
 echo "${GREEN}...done${WHITE}"
 
@@ -89,7 +88,7 @@ echo "${GREEN}...done${WHITE}"
 echo
 echo "${YELLOW}**** RPi 0/2 check to enable Edimax wifi dongle option... *****${WHITE}"
 
-if [[ "rpi_02_boards" =~ "${REVISION}" ]]; then
+
     echo "${MAGENTA}copying the hostapd-edimax binary...${WHITE}"
 
     rm -f /usr/sbin/hostapd-edimax
@@ -103,9 +102,10 @@ if [[ "rpi_02_boards" =~ "${REVISION}" ]]; then
     fi
 
     # install the binary
-    mv ./hostapd /usr/sbin/hostapd-edimax
     chmod 755 /usr/sbin/hostapd-edimax
+    mv ./hostapd /usr/sbin/hostapd-edimax
 
+if [[ "rpi_02_boards" =~ "${REVISION}" ]]; then
     if ! grep -q "options 8192cu rtw_power_mgnt=0 rtw_enusbss=0" "/etc/modprobe.d/8192cu.conf"; then
         echo "options 8192cu rtw_power_mgnt=0 rtw_enusbss=0" >>/etc/modprobe.d/8192cu.conf
     fi
