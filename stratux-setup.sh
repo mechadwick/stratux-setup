@@ -31,6 +31,16 @@ SCRIPTDIR="`pwd`"
 #set -e
 
 #### execute the script: bash stratux-setup.sh
+####
+#### to log the output: bash stratux-setup.sh | tee log
+####
+#### to change keyboard run: raspi-config
+#### then select:
+#### 4 localization options > 3 change keyboard layout > 
+#### generic 105-key > other > English US > English (US) > The default... > No compose key
+####
+#### tab > tab > enter
+#### reboot
 
 #### Revision numbers found via cat /proc/cpuinfo
 #
