@@ -47,27 +47,13 @@ echo "${GREEN}...done${WHITE}"
 
 
 ##############################################################
-## Setup /etc/hostapd/hostapd.conf
+## Copy hostapd-edimax.conf and hostapd.conf
 ##############################################################
 echo
-echo "${YELLOW}**** Setup /etc/hostapd/hostapd.conf *****${WHITE}"
+echo "${YELLOW}**** Copy hostapd-edimax.conf and hostapd.conf *****${WHITE}"
 
-cat <<EOT > /etc/hostapd/hostapd-edimax.conf
-interface=$wifi_interface
-driver=rtl871xdrv
-hw_mode=g
-wmm_enabled=1
-ieee80211n=1
-ignore_broadcast_ssid=0
-EOT
-
-cat <<EOT > /etc/hostapd/hostapd.conf
-interface=$wifi_interface
-hw_mode=g
-wmm_enabled=1
-ieee80211n=1
-ignore_broadcast_ssid=0
-EOT
+cp -f ${SCRIPTDIR}/files/hostapd-edimax.conf /etc/hostapd/hostapd-edimax.conf
+cp -f ${SCRIPTDIR}/files/hostapd.conf /etc/hostapd/hostapd.conf
 
 echo "${GREEN}...done${WHITE}"
 
