@@ -1,3 +1,5 @@
+*** Note, currently outdated and not in sync with the latest Stratux code ***
+
 An alternative method for installing Stratux on your board's Linux OS.
 
 The script is currently in beta development.
