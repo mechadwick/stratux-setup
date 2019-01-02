@@ -21,7 +21,7 @@ if ! grep -q "dtparam=audio=on" "/boot/config.txt"; then
     echo "dtparam=audio=on" >>/boot/config.txt
 fi
 
-if [ "$REVISION" == "$RPI2BxREV" ] || [ "$REVISION" == "$RPI2ByREV" ] || [ "$REVISION" == "$RPI0xREV" ] || [ "$REVISION" == "$RPI0yREV" ]; then
+if [ "$REVISION" == "$RPI2BxREV" ] || [ "$REVISION" == "$RPI2ByREV" ] || [ "$REVISION" == "$RPI0xREV" ] || [ "$REVISION" == "$RPI0yREV" ] || [ "$REVISION" == "$RPI0wREV" ]; then
     if ! grep -q "max_usb_current=1" "/boot/config.txt"; then
         echo "max_usb_current=1" >>/boot/config.txt
     fi
