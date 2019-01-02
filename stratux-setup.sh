@@ -53,6 +53,7 @@ SCRIPTDIR="`pwd`"
 #
 RPI0xREV=900092
 RPI0yREV=900093
+RPI0wREV=9000cl
 
 RPI2BxREV=a01041
 RPI2ByREV=a21041
@@ -131,7 +132,7 @@ echo "${GREEN}...done${WHITE}"
 echo
 echo "${YELLOW}**** Installing dependencies... *****${WHITE}"
 
-if [ "$REVISION" == "$RPI2BxREV" ] || [ "$REVISION" == "$RPI2ByREV" ]  || [ "$REVISION" == "$RPI3BxREV" ] || [ "$REVISION" == "$RPI3ByREV" ] || [ "$REVISION" == "$RPI0xREV" ] || [ "$REVISION" == "$RPI0yREV" ]; then
+if [ "$REVISION" == "$RPI2BxREV" ] || [ "$REVISION" == "$RPI2ByREV" ]  || [ "$REVISION" == "$RPI3BxREV" ] || [ "$REVISION" == "$RPI3ByREV" ] || [ "$REVISION" == "$RPI0xREV" ] || [ "$REVISION" == "$RPI0yREV" ] || [ "$REVISION" == "$RPI0wREV" ]; then
     apt-get install -y rpi-update
     rpi-update
 fi
@@ -172,7 +173,7 @@ echo "${GREEN}...done${WHITE}"
 echo
 echo "${YELLOW}**** Hardware check... *****${WHITE}"
 
-if [ "$REVISION" == "$RPI2BxREV" ] || [ "$REVISION" == "$RPI2ByREV" ]  || [ "$REVISION" == "$RPI3BxREV" ] || [ "$REVISION" == "$RPI3ByREV" ] || [ "$REVISION" == "$RPI0xREV" ] || [ "$REVISION" == "$RPI0yREV" ]; then
+if [ "$REVISION" == "$RPI2BxREV" ] || [ "$REVISION" == "$RPI2ByREV" ]  || [ "$REVISION" == "$RPI3BxREV" ] || [ "$REVISION" == "$RPI3ByREV" ] || [ "$REVISION" == "$RPI0xREV" ] || [ "$REVISION" == "$RPI0yREV" ] || [ "$REVISION" == "$RPI0wREV" ]; then
     echo
     echo "${MAGENTA}Raspberry Pi detected...${WHITE}"
 
