@@ -131,7 +131,10 @@ echo "${GREEN}...done${WHITE}"
 ##############################################################
 echo
 echo "${YELLOW}**** Installing dependencies... *****${WHITE}"
-
+echo "$REVISION"
+if [ "$REVISION" == "$RPI0wREV" ]; then
+    echo "Raspberry Pi Zero Detected!"
+fi
 if [ "$REVISION" == "$RPI2BxREV" ] || [ "$REVISION" == "$RPI2ByREV" ]  || [ "$REVISION" == "$RPI3BxREV" ] || [ "$REVISION" == "$RPI3ByREV" ] || [ "$REVISION" == "$RPI0xREV" ] || [ "$REVISION" == "$RPI0yREV" ] || [ "$REVISION" == "$RPI0wREV" ]; then
     apt-get install -y rpi-update
     rpi-update
