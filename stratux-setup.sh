@@ -216,28 +216,6 @@ echo "${GREEN}...done${WHITE}"
 
 
 ##############################################################
-##  SSH setup and config
-##############################################################
-echo
-echo "${YELLOW}**** SSH setup and config... *****${WHITE}"
-
-if [ ! -d /etc/ssh/authorized_keys ]; then
-    mkdir -p /etc/ssh/authorized_keys
-fi
-
-cp -n /etc/ssh/authorized_keys/root{,.bak}
-cp -f ${SCRIPTDIR}/files/root /etc/ssh/authorized_keys/root
-chown root.root /etc/ssh/authorized_keys/root
-chmod 644 /etc/ssh/authorized_keys/root
-
-cp -n /etc/ssh/sshd_config{,.bak}
-cp -f ${SCRIPTDIR}/files/sshd_config /etc/ssh/sshd_config
-rm -f /usr/share/dbus-1/system-services/fi.epitest.hostap.WPASupplicant.service
-
-echo "${GREEN}...done${WHITE}"
-
-
-##############################################################
 ##  Hardware blacklisting
 ##############################################################
 echo
